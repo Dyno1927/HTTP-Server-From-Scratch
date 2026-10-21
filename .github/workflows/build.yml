@@ -1,0 +1,69 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build (${{ matrix.cxx }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cxx: [clang++, g++]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Clang
+        if: matrix.cxx == 'clang++'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang
+
+      - name: Show toolchain
+        run: |
+          ${{ matrix.cxx }} --version | head -n 1
+          make --version | head -n 1
+
+      - name: Build
+        run: make CXX=${{ matrix.cxx }}
+
+      - name: Check binary
+        run: |
+          if [ -f Build/Server ]; then
+            echo "Built Build/Server"
+            file Build/Server
+          else
+            echo "No sources in Src/ yet - nothing to link."
+          fi
+
+  sanitizers:
+    name: sanitizers
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Clang
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang
+
+      - name: Build with ASan + UBSan
+        run: make CXX=clang++ san
+
+      - name: Check binary
+        run: |
+          if [ -f Build/Server ]; then
+            echo "Built Build/Server with sanitizers"
+            ldd Build/Server | grep -E 'asan|ubsan' || true
+          else
+            echo "No sources in Src/ yet - nothing to link."
+          fi
