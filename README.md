@@ -41,6 +41,21 @@ make clean    # remove Build/
 
 If GCC is the only compiler you have, `make CXX=g++` works too.
 
+## Branches
+
+- `main` — stable. Only merged, working code lands here.
+- `dev` — developing. Day-to-day work and experiments happen here; merged into
+  `main` once a phase's completion criteria are met.
+
+I keep `main` green and do all work on `dev`.
+
+## CI
+
+GitHub Actions (`.github/workflows/Build.yml`) runs on every push and pull
+request to `main`: a matrix build with both Clang and GCC, plus a sanitizer
+build (ASan + UBSan). A green check means the code compiles on both compilers
+and stays sanitizer-clean.
+
 ## Status
 
 Scaffold only — there is no server code in here yet. The CI workflow builds
