@@ -66,8 +66,8 @@ gets checked automatically.
 
 MIT — see [LICENSE](LICENSE). Take it, fork it, ship it, use it in whatever you
 like, commercial or not. The one thing the license asks is that you keep the
-copyright notice and credit me, Khanishk Gupta, as the original author.
+copyright notice and credit me, Dyno, as the original author.
 
 ---
 
-Built by [Khanishk Gupta](https://github.com/Dyno1927).
+Built by [Dyno](https://github.com/Dyno1927).
