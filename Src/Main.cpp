@@ -1,10 +1,8 @@
 #include "TCPServer.hpp"
+
 #include <iostream>
 
-using namespace std;
-
-// Entry point: wire the socket lifecycle in order, then run the accept loop.
-// Stop with Ctrl+C (graceful shutdown is a later phase).
+// wire the socket lifecycle in order, then run the accept loop. Ctrl+C to stop.
 int main()
 {
     TCPServer server;
@@ -19,8 +17,8 @@ int main()
     if (!server.listenOn())
         return 1; // listen()
 
-    cout << "Server starting on port " << PORT << "..." << endl;
-    server.run(); // runs forever
+    std::cout << "Server starting on port " << PORT << "..." << std::endl;
+    server.run(); // blocks forever
 
     return 0;
 }

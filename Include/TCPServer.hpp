@@ -1,17 +1,17 @@
 #ifndef TCP_SERVER_HPP
 #define TCP_SERVER_HPP
 
-// POSIX socket types. Included here so the header stays self-contained.
+// POSIX socket stuff, in the header so any file that includes it compiles alone.
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-// Wraps one listening TCP socket and its accept loop.
-// Lifecycle (in order): createSocket -> setReuseAddr -> bindTo -> listenOn -> run.
-// run() never returns; stop() / the destructor close the listening socket.
+// wraps one listening TCP socket + its accept loop.
+// order of calls: createSocket -> setReuseAddr -> bindTo -> listenOn -> run
+// run() never comes back; stop() or the destructor closes the socket.
 class TCPServer
 {
   private:
-    int serverFd; // listening fd; -1 means "not created yet"
+    int serverFd; // listening fd, -1 = not open yet
 
   public:
     TCPServer();
