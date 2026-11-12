@@ -789,50 +789,36 @@ These are potential future directions, not commitments.
 ---
 
 ## 12. Immediate Next Steps
-The next milestone is **Phase 0**, followed by **Phase 1**.
 
-### Step 1 — Inspect the Existing Repository
-* Inspect the existing CMake configuration.
-* Inspect source files and headers.
-* Inspect the Makefile and README.
-* Check the Git working tree.
-* Identify existing build conventions.
+Phases 1, 2 and 3 are complete and tagged (`phase-1`, `phase-2`, `phase-3`).
+The next milestone is **Phase 4 — First REST API**.
 
-### Step 2 — Verify the Development Environment
-* Confirm the Clang++ version.
-* Confirm the CMake version.
-* Verify the current build works.
-* Test a clean, out-of-source build.
-* Confirm compiler warnings are visible.
+### Step 1 — Design the handler interface
+* A small `Handler` callable (request in, response out) or a virtual base.
+* Keep HTTP protocol handling separate from application logic.
 
-### Step 3 — Plan the First TCP Server
-* Identify the smallest implementation that fits the current codebase.
-* Study the socket lifecycle.
-* Understand each system call before implementing it.
-* Bind to loopback by default.
-* Keep the server synchronous and single-client initially.
+### Step 2 — Add a route registry
+* Match method + path; support a path parameter (`{id}`).
+* Unknown route -> 404; unsupported method -> 405.
 
-### Step 4 — Implement Incrementally
-* Create the socket.
-* Bind the socket.
-* Listen for connections.
-* Accept one client.
-* Receive bytes.
-* Send a simple response.
-* Close resources correctly.
-* Handle system-call failures.
+### Step 3 — Implement the endpoints
+* `GET /health` -> server health.
+* `GET /api/items` -> collection.
+* `GET /api/items/{id}` -> single item or 404.
 
-*Compile and test after every meaningful change.*
+### Step 4 — In-memory data store
+* A small `std::vector`/`std::map` of items; no database yet.
 
-### Step 5 — Validate and Document
-* Test a normal client connection.
-* Test client disconnects.
-* Test port conflicts.
-* Check error handling.
-* Record the results.
-* Document the implementation and its limitations.
+### Step 5 — JSON
+* Evaluate a maintained JSON library (nlohmann/json) for serialization.
+* Keep JSON an application-layer concern, not part of HTTP parsing.
 
-Do not start by implementing a complete HTTP parser, router, asynchronous runtime, or framework API. First understand the path from a TCP socket to a working connection. Then build HTTP on top of that foundation.
+### Step 6 — Validate and document
+* Known vs unknown route, supported vs unsupported method, missing resource,
+  invalid parameter, correct status codes and content types.
+* Update `Docs/HTTP-SCOPE.md` with the new endpoints.
+
+Do not introduce authentication, databases, or a routing DSL yet.
 
 ---
 
