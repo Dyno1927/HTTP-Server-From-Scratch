@@ -24,8 +24,9 @@ I'm learning in public. Progress lands as commits, not promises.
 ```
 Include/    my headers
 Src/        my implementation
+Tests/      unit tests
 Build/      compiler output (gitignored, created by make)
-Makefile    build + run + sanitizer targets
+Makefile    build + run + sanitizer + test targets
 ```
 
 ## Build
@@ -34,12 +35,36 @@ Everything builds with Clang and C++20:
 
 ```sh
 make          # build Build/Server
-make run      # build, then run it
+make run      # build, then run it (listens on 127.0.0.1:8080)
+make test     # build and run the unit tests (Tests/)
 make san      # rebuild with AddressSanitizer + UndefinedBehaviorSanitizer
 make clean    # remove Build/
 ```
 
-If GCC is the only compiler you have, `make CXX=g++` works too.
+If GCC is the only compiler you have, `make CXX=g++` works too (and
+`make CXX=g++ test` for tests).
+
+## Run
+
+```sh
+make run
+```
+
+Then in another terminal:
+
+```sh
+# valid request
+printf 'GET / HTTP/1.1\r\nHost: x\r\n\r\n' | nc 127.0.0.1 8080
+
+# fragmented (two halves with a delay)
+(printf 'GET / HTTP/1.1\r\n'; sleep 0.3; printf 'Host: x\r\n\r\n') | nc 127.0.0.1 8080
+
+# malformed -> 400 Bad Request
+printf 'GET / HTTP/1.1\r\nBadLine\r\n\r\n' | nc 127.0.0.1 8080
+```
+
+The server binds to loopback only and handles one connection at a time.
+Press Ctrl+C to stop.
 
 ## Branches
 
@@ -52,9 +77,10 @@ I keep `stable` green and do all work on `dev`.
 ## CI
 
 GitHub Actions (`.github/workflows/Build.yml`) runs on every push and pull
-request to `stable` (and `dev`): a matrix build with both Clang and GCC, plus a sanitizer
-build (ASan + UBSan). A green check means the code compiles on both compilers
-and stays sanitizer-clean.
+request to `stable` (and `dev`): a matrix build with both Clang and GCC, the
+unit tests (`make test`), and a sanitizer build (ASan + UBSan). A green check
+means the code compiles on both compilers, the tests pass, and it stays
+sanitizer-clean.
 
 ## Status
 

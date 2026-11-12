@@ -34,6 +34,9 @@ jobs:
       - name: Build
         run: make CXX=${{ matrix.cxx }}
 
+      - name: Run tests
+        run: make CXX=${{ matrix.cxx }} test
+
       - name: Check binary
         run: |
           if [ -f Build/Server ]; then
@@ -58,6 +61,9 @@ jobs:
 
       - name: Build with ASan + UBSan
         run: make CXX=clang++ san
+
+      - name: Run tests with sanitizers
+        run: make CXX=clang++ CXXFLAGS="-std=c++20 -Wall -Wextra -g -O0 -IInclude -fsanitize=address,undefined" test
 
       - name: Check binary
         run: |

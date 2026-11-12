@@ -1,5 +1,5 @@
-#include "HTTPRequest.hpp"
 #include "HTTPParser.hpp"
+#include "HTTPRequest.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -8,15 +8,14 @@
 // tiny test harness: count failures, print pass/fail, return non-zero on any
 // failure so CI / `make test` fails loudly.
 static int failures = 0;
-#define CHECK(cond)                                                            \
-    do                                                                         \
-    {                                                                          \
-        if (!(cond))                                                           \
-        {                                                                      \
-            std::cerr << "FAIL: " << #cond << " (" << __FILE__ << ":"         \
-                      << __LINE__ << ")\n";                                    \
-            ++failures;                                                        \
-        }                                                                      \
+#define CHECK(cond)                                                                                                    \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::cerr << "FAIL: " << #cond << " (" << __FILE__ << ":" << __LINE__ << ")\n";                            \
+            ++failures;                                                                                                \
+        }                                                                                                              \
     } while (false)
 
 int main()
@@ -35,8 +34,7 @@ int main()
     // 2. fragmented across two feeds
     {
         HTTPParser p;
-        CHECK(p.feed("GET /api/items/42 HTTP/1.1\r\nHost: localhost\r\n") ==
-              ParseResult::Incomplete);
+        CHECK(p.feed("GET /api/items/42 HTTP/1.1\r\nHost: localhost\r\n") == ParseResult::Incomplete);
         CHECK(p.feed("X-Custom: hello\r\n\r\n") == ParseResult::Complete);
         HTTPRequest r = p.takeRequest();
         CHECK(r.target == "/api/items/42");
@@ -70,8 +68,7 @@ int main()
     // 6. case-insensitive header names
     {
         HTTPParser p;
-        CHECK(p.feed("GET / HTTP/1.1\r\nContent-Type: text/plain\r\n\r\n") ==
-              ParseResult::Complete);
+        CHECK(p.feed("GET / HTTP/1.1\r\nContent-Type: text/plain\r\n\r\n") == ParseResult::Complete);
         HTTPRequest r = p.takeRequest();
         CHECK(r.headers.at("content-type") == "text/plain");
     }
@@ -79,8 +76,7 @@ int main()
     // 7. OWS trimming on header values
     {
         HTTPParser p;
-        CHECK(p.feed("GET / HTTP/1.1\r\nHost:   example.com   \r\n\r\n") ==
-              ParseResult::Complete);
+        CHECK(p.feed("GET / HTTP/1.1\r\nHost:   example.com   \r\n\r\n") == ParseResult::Complete);
         HTTPRequest r = p.takeRequest();
         CHECK(r.headers.at("host") == "example.com");
     }
