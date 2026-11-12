@@ -134,8 +134,7 @@ void TCPServer::handleClient(int clientFd)
     if (result == ParseResult::Complete)
     {
         HTTPRequest request = parser.takeRequest();
-        std::cout << request.method << " " << request.target << " "
-                  << request.version << std::endl;
+        std::cout << request.method << " " << request.target << " " << request.version << std::endl;
 
         response.statusCode = 200;
         response.reason = "OK";
@@ -169,8 +168,7 @@ void TCPServer::handleClient(int clientFd)
     std::size_t offset = 0;
     while (offset < serialized.size())
     {
-        ssize_t bytesWritten = send(clientFd, serialized.c_str() + offset,
-                            serialized.size() - offset, 0);
+        ssize_t bytesWritten = send(clientFd, serialized.c_str() + offset, serialized.size() - offset, 0);
         if (bytesWritten < 0)
         {
             if (errno == EINTR)

@@ -19,10 +19,19 @@ Build:
 run: Build/Server
 	./Build/Server
 
+# parser unit tests. compiles Tests/*.cpp against the parser implementation.
+TESTS := $(patsubst Tests/%.cpp,Build/%,$(wildcard Tests/*.cpp))
+
+test: $(TESTS)
+	@for t in $(TESTS); do echo "== $$t =="; ./$$t || exit 1; done
+
+Build/ParserTests: Tests/ParserTests.cpp Src/HTTPParser.cpp | Build
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 san:
 	$(MAKE) clean
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) $(SAN)" all
 
-.PHONY: all run san clean
+.PHONY: all run san clean test
 clean:
 	rm -rf Build
