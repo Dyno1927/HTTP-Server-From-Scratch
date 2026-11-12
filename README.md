@@ -58,9 +58,13 @@ and stays sanitizer-clean.
 
 ## Status
 
-Scaffold only — there is no server code in here yet. The CI workflow builds
-whatever lands in `Src/` and runs a sanitizer pass, so the first real commit
-gets checked automatically.
+Phase 3 complete. The server accepts TCP connections, parses an HTTP/1.1
+request line + headers incrementally (handling fragmented input), and returns
+`200 OK` for valid requests or `400 Bad Request` for malformed ones. Builds
+clean on both Clang and GCC, sanitizer-clean (ASan + UBSan).
+
+Previous phases: Phase 1 (TCP listener) and Phase 2 (valid HTTP response) are
+tagged `phase-1` and `phase-2`. Next up: Phase 4 (first REST API).
 
 ## License
 

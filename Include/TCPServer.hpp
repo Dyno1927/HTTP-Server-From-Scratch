@@ -13,6 +13,9 @@ class TCPServer
   private:
     int serverFd; // listening fd, -1 = not open yet
 
+    // handle one accepted connection end to end: read, parse, respond, close.
+    void handleClient(int clientFd);
+
   public:
     TCPServer();
     ~TCPServer();
