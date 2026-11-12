@@ -2,12 +2,10 @@
 
 #include "HTTPResponse.hpp"
 
-#include <arpa/inet.h> // htonl/htons
-#include <cstring>     // strlen
-#include <iostream>    // stdout
-#include <unistd.h>    // close
-
-using namespace std;
+#include <arpa/inet.h>
+#include <cstring>
+#include <iostream>
+#include <unistd.h>
 
 TCPServer::TCPServer() : serverFd(-1) {}
 
@@ -103,12 +101,12 @@ void TCPServer::run()
         }
         else if (receive == 0)
         {
-            cout << "Client closed connection" << endl;
+            std::cout << "Client closed connection" << std::endl;
         }
         else
         {
             buffer[receive] = '\0';
-            cout << "Received: " << buffer << endl;
+            std::cout << "Received: " << buffer << std::endl;
 
             // phase 2: fixed response on purpose. request parsing is phase 3,
             // so for now every request gets the same valid HTTP reply. the
@@ -118,10 +116,10 @@ void TCPServer::run()
             response.reason = "OK";
             response.body = "Hello World!";
             response.headers["Content-Type"] = "text/plain";
-            response.headers["Content-Length"] = to_string(response.body.size());
+            response.headers["Content-Length"] = std::to_string(response.body.size());
             response.headers["Connection"] = "close";
 
-            string serialized = response.toString();
+            std::string serialized = response.toString();
             ssize_t sent = send(clientFd, serialized.c_str(), serialized.size(), 0);
             if (sent < 0)
             {
