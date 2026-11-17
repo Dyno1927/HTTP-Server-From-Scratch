@@ -1,6 +1,5 @@
 #include "HTTPParser.hpp"
 
-#include <algorithm>
 #include <cctype>
 #include <cstring>
 #include <utility>

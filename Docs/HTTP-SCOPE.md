@@ -1,6 +1,6 @@
 # HTTP Scope — what this server implements
 
-Current phase: **Phase 3 (request parsing)**. Everything below is what the
+Current phase: **Phase 4 (first REST API)**. Everything below is what the
 code in `Src/` actually does today. Planned features are not listed here.
 
 ## Implemented
@@ -14,8 +14,13 @@ code in `Src/` actually does today. Planned features are not listed here.
   calls; distinguishes `Incomplete` (need more bytes) from `Error`.
 - Resource limits: request line 8 KB, per header 8 KB, 100 headers max,
   64 KB total.
-- Responses: `200 OK` ("Hello World!") on a valid request, `400 Bad Request`
-  on parse failure or early client close.
+- Responses: `200 OK` with a JSON body for `/health`, `/api/items`,
+  `/api/items/{id}`; `404 Not Found` for unknown paths; `405 Method Not Allowed`
+  for known paths with the wrong method; `400 Bad Request` on parse failure or
+  early client close.
+- Routing: method + path dispatch through `Router`; endpoints `/health`,
+  `/api/items`, `/api/items/{id}`; unknown path -> 404, known path with wrong
+  method -> 405.
 - Correct framing: status line, headers, blank line, body; `Content-Length`
   matches body size; `Connection: close`.
 
@@ -24,7 +29,6 @@ code in `Src/` actually does today. Planned features are not listed here.
 - Request body (Phase 5).
 - `Content-Length` / chunked transfer coding (Phase 5).
 - Keep-alive / persistent connections (Phase 6).
-- Routing / REST endpoints (Phase 4).
 - Concurrency (Phase 10).
 - Static files, TLS, HTTP/2, WebSockets (later phases).
 
