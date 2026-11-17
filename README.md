@@ -84,13 +84,14 @@ sanitizer-clean.
 
 ## Status
 
-Phase 3 complete. The server accepts TCP connections, parses an HTTP/1.1
-request line + headers incrementally (handling fragmented input), and returns
-`200 OK` for valid requests or `400 Bad Request` for malformed ones. Builds
-clean on both Clang and GCC, sanitizer-clean (ASan + UBSan).
+Phase 4 complete. The server now routes `GET /health`, `GET /api/items`, and
+`GET /api/items/{id}` through a `Router` with an in-memory store, returning
+JSON; unknown paths -> 404, wrong method -> 405. Builds clean on both Clang
+and GCC, sanitizer-clean (ASan + UBSan).
 
-Previous phases: Phase 1 (TCP listener) and Phase 2 (valid HTTP response) are
-tagged `phase-1` and `phase-2`. Next up: Phase 4 (first REST API).
+Previous phases: Phase 1 (TCP listener), Phase 2 (valid HTTP response), and
+Phase 3 (request parsing) are tagged `phase-1`, `phase-2`, `phase-3`. Next up:
+Phase 5 (correct HTTP message framing).
 
 ## License
 

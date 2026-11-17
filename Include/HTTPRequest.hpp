@@ -14,6 +14,10 @@ struct HTTPRequest
 
     // Header names are stored lowercased so lookups are case-insensitive.
     std::map<std::string, std::string> headers;
+
+    // Path params extracted by the router, e.g. {"id":"42"}.
+    // Empty for exact routes like /health. Filled in before the handler runs.
+    std::map<std::string, std::string> params;
 };
 
 // Outcome of feeding bytes to the parser.

@@ -3,13 +3,3 @@ Build/
 
 # Editor Cron
 .vscode/
-
-# Agent tooling (local only)
-.agents/
-AGENTS.md
-.claude/
-.codex/
-.opencode/
-
-# Claude Code (local only)
-CLAUDE.md
