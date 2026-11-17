@@ -28,6 +28,10 @@ test: $(TESTS)
 Build/ParserTests: Tests/ParserTests.cpp Src/HTTPParser.cpp | Build
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+# router unit tests. compiles against the router + response + parser impls.
+Build/RouterTests: Tests/RouterTests.cpp Src/Router.cpp Src/HTTPResponse.cpp Src/HTTPParser.cpp | Build
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 san:
 	$(MAKE) clean
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) $(SAN)" all

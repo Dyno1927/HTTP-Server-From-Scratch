@@ -9,7 +9,10 @@
 #include <iostream>
 #include <unistd.h>
 
-TCPServer::TCPServer() : serverFd(-1) {}
+TCPServer::TCPServer() : serverFd(-1)
+{
+    setupRoutes();
+}
 
 TCPServer::~TCPServer()
 {
@@ -17,6 +20,99 @@ TCPServer::~TCPServer()
     {
         close(serverFd);
     }
+}
+
+void TCPServer::setupRoutes()
+{
+    // seed the in-memory store. ids are the keys.
+    store_[1] = {1, "Widget"};
+    store_[2] = {2, "Gadget"};
+    store_[3] = {3, "Gizmo"};
+
+    router_.add("GET", "/health",
+                [](const HTTPRequest &)
+                {
+                    HTTPResponse r;
+                    r.statusCode = 200;
+                    r.reason = "OK";
+                    r.body = "{\"status\":\"ok\"}";
+                    r.headers["Content-Type"] = "application/json";
+                    r.headers["Content-Length"] = std::to_string(r.body.size());
+                    r.headers["Connection"] = "close";
+                    return r;
+                });
+
+    router_.add("GET", "/api/items",
+                [this](const HTTPRequest &)
+                {
+                    std::string body = "[";
+                    bool first = true;
+                    for (const auto &kv : store_)
+                    {
+                        if (!first)
+                        {
+                            body += ",";
+                        }
+                        first = false;
+                        body += "{\"id\":" + std::to_string(kv.second.id) + ",\"name\":\"" + kv.second.name + "\"}";
+                    }
+                    body += "]";
+
+                    HTTPResponse r;
+                    r.statusCode = 200;
+                    r.reason = "OK";
+                    r.body = body;
+                    r.headers["Content-Type"] = "application/json";
+                    r.headers["Content-Length"] = std::to_string(r.body.size());
+                    r.headers["Connection"] = "close";
+                    return r;
+                });
+
+    router_.add("GET", "/api/items/{id}",
+                [this](const HTTPRequest &req)
+                {
+                    int id = 0;
+                    try
+                    {
+                        id = std::stoi(req.params.at("id"));
+                    }
+                    catch (...)
+                    {
+                        HTTPResponse r;
+                        r.statusCode = 400;
+                        r.reason = "Bad Request";
+                        r.body = "Bad Request\n";
+                        r.headers["Content-Type"] = "text/plain";
+                        r.headers["Content-Length"] = std::to_string(r.body.size());
+                        r.headers["Connection"] = "close";
+                        return r;
+                    }
+
+                    auto it = store_.find(id);
+                    if (it == store_.end())
+                    {
+                        HTTPResponse r;
+                        r.statusCode = 404;
+                        r.reason = "Not Found";
+                        r.body = "Not Found\n";
+                        r.headers["Content-Type"] = "text/plain";
+                        r.headers["Content-Length"] = std::to_string(r.body.size());
+                        r.headers["Connection"] = "close";
+                        return r;
+                    }
+
+                    const Item &item = it->second;
+                    std::string body = "{\"id\":" + std::to_string(item.id) + ",\"name\":\"" + item.name + "\"}";
+
+                    HTTPResponse r;
+                    r.statusCode = 200;
+                    r.reason = "OK";
+                    r.body = body;
+                    r.headers["Content-Type"] = "application/json";
+                    r.headers["Content-Length"] = std::to_string(r.body.size());
+                    r.headers["Connection"] = "close";
+                    return r;
+                });
 }
 
 // open a TCP socket. AF_INET = IPv4, SOCK_STREAM = TCP.
@@ -136,12 +232,7 @@ void TCPServer::handleClient(int clientFd)
         HTTPRequest request = parser.takeRequest();
         std::cout << request.method << " " << request.target << " " << request.version << std::endl;
 
-        response.statusCode = 200;
-        response.reason = "OK";
-        response.body = "Hello World!";
-        response.headers["Content-Type"] = "text/plain";
-        response.headers["Content-Length"] = std::to_string(response.body.size());
-        response.headers["Connection"] = "close";
+        response = router_.handle(request);
     }
     else
     {
